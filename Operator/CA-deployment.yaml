@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: certificate-authority-deployment
+    labels:
+        app: ca
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: ca
+    template:
+        metadata:
+            labels:
+                app: ca
+        spec:
+            volumes:
+                - name: task-pv-storage
+                  persistentVolumeClaim:
+                     claimName: task-pv-claim
+            containers:
+                - name: certificate-authority
+                  image: gcr.io/cloudpoint-development/ca:sn
+                  ports:
+                    - name: without-ssl
+                      containerPort: 5000
+                  volumeMounts:
+                    - name: task-pv-storage
+                      mountPath: "app/new_certs"

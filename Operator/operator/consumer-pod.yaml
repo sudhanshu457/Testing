@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata: 
+    name: consumer-pod
+spec:
+     volumes:
+        - name: task-pv-storage
+          persistentVolumeClaim:
+              claimName: task-pv-claim2
+     containers:
+        - name: consumer-pod
+          image: sudhanshu457/consumer:latest
+          env:
+            - name: cacert
+              valueFrom:
+                secretKeyRef:
+                  name: consumer-secret
+                  key: cacert
+            - name: consumercert
+              valueFrom:
+                secretKeyRef:
+                  name: consumer-secret
+                  key: consumercert
+            - name: consumerkey
+              valueFrom:
+                secretKeyRef:
+                  name: consumer-secret
+                  key: consumerkey
+            - name: hostname
+              value: 'rabbitmq-node-port'
+          volumeMounts:
+            - name: task-pv-storage
+              mountPath: "/certificate/consumer"
+              subPath: "consumer-server-certificate"
+            - name: task-pv-storage
+              mountPath: "/certificate/CA"
+              subPath: "Trusted-CA"
+            - name: task-pv-storage
+              mountPath: "/usr/src/app/logs"
+              subPath: "logs"
+
+            

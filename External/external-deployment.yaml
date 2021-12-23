@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+    name: external-deployment
+    labels:
+        app: external
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: external
+    template:
+        metadata:
+            labels:
+                app: external
+        spec:
+            volumes:
+                - name: task-pv-storage
+                  persistentVolumeClaim:
+                      claimName: task-pv-claim
+            containers:
+                - name: external-deployment
+                  image:  gcr.io/cloudpoint-development/external:v1
+                  env:
+                    - name: cacert
+                      valueFrom:
+                        secretKeyRef:
+                          name: external-secret
+                          key: cacert
+                    - name: externalcert
+                      valueFrom:
+                        secretKeyRef:
+                          name: external-secret
+                          key: externalcert
+                    - name: externalkey
+                      valueFrom:
+                        secretKeyRef:
+                          name: external-secret
+                          key: externalkey
+                    - name: hostname
+                      value: '192.168.49.2/rabbitmq/nonsecure-access'
+                  volumeMounts:
+                    - name: task-pv-storage
+                      mountPath: "/certificate/external"
+                      subPath: "external-server-certificate"
+                    - name: task-pv-storage
+                      mountPath: "/certificate/CA"
+                      subPath: "Trusted-CA"
+                    - name: task-pv-storage
+                      mountPath: "/usr/src/app/logs"
+                      subPath: "logs"
+
+            

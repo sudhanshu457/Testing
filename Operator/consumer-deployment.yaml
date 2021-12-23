@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+    name: consumer-deployment
+    labels:
+        app: consumer
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: consumer
+    template:
+        metadata:
+            labels:
+                app: consumer
+        spec:
+            volumes:
+                - name: task-pv-storage
+                  persistentVolumeClaim:
+                      claimName: task-pv-claim
+            containers:
+                - name: consumer-deployment
+                  image: gcr.io/cloudpoint-development/consumer:v21
+                  env:
+                    - name: cacert
+                      valueFrom:
+                        secretKeyRef:
+                          name: consumer-secret
+                          key: cacert
+                    - name: consumercert
+                      valueFrom:
+                        secretKeyRef:
+                          name: consumer-secret
+                          key: consumercert
+                    - name: consumerkey
+                      valueFrom:
+                        secretKeyRef:
+                          name: consumer-secret
+                          key: consumerkey
+                    - name: hostname
+                      value: 'rabbitmq-cluster-ip-service'
+                  volumeMounts:
+                    - name: task-pv-storage
+                      mountPath: "/certificate/consumer"
+                      subPath: "consumer-server-certificate"
+                    - name: task-pv-storage
+                      mountPath: "/certificate/CA"
+                      subPath: "Trusted-CA"
+                    - name: task-pv-storage
+                      mountPath: "/usr/src/app/logs"
+                      subPath: "logs"
+
+                    

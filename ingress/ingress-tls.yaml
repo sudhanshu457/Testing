@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: btech-ingress
+  annotations:
+    kubernetes.io/ingress.class: gce
+    gce.ingress.kubernetes.io/ssl-passthrough: "true"
+    gce.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - btech-proj.com
+  rules:
+    - host: btech-proj.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              serviceName: rabbitmq-cluster-ip-service-1
+              servicePort: 5672
+        

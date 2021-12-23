@@ -1,0 +1,36 @@
+*********************************************************
+--useful links if one goes through docker-desktop and wsl2
+https://docs.docker.com/docker-for-windows/wsl/
+https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-containers
+https://docs.docker.com/docker-for-windows/wsl/
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/   (if we want to use hostpath)
+1. You can find WSL2 volumes under a hidden network share. Open Windows Explorer, and type \\wsl$ into the location bar.
+ Hit enter, and it should display your WSL volumes, including the ones for Docker for Windows.
+
+2. /mnt/host/wsl/docker-desktop-data/tarcache/entries/docker.tar/58720b1c3bb72aea79de820cb98fd260c119b6c254a8306e1cf68b5cf83bbe52/containers/services/docker/rootfs/data
+  path where all certificates got stored
+
+3. ls -a ( prints all hidden files)
+
+4. find / -t d -name app (finds a file in a directory)
+
+
+
+******************************logger-elasticsearch-kibana********************************
+logger using fluentd , elastic-search, kibana
+
+https://lernentec.com/post/running-simple-elasticsearch-kibana-minikube/
+--to setup elastic search and kibana
+
+https://medium.com/kubernetes-tutorials/cluster-level-logging-in-kubernetes-with-fluentd-e59aa2b6093a
+--to setup fluentd
+
+https://docs.fluentd.org/v/0.12/
+
+https://github.com/fluent/fluentd-kubernetes-daemonset
+
+Notes:  docker inspect <container ID> tells us every thing including logFiles path
+
+
+
+docker run  -e cacert=/certificate/CA/CA-cert.pem -e externalcert=/certificate/external/external-cert.pem -e  externalkey=/certificate/external/external-key.pem -e hostname=rabbitmq-cluster-ip-service -v /external-server-certificate/:/certificate/external/: -v /Trusted-CA/:/certificate/CA/ manali74/external 

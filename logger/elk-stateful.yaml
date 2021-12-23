@@ -1,0 +1,41 @@
+# By default, Elasticsearch uses two ports to listen to external TCP traffic;
+
+# Port 9200 is used for all API calls over HTTP. This includes search and aggregations, monitoring and anything else that uses a HTTP request. All client libraries will use this port to talk to Elasticsearch
+# Port 9300 is a custom binary protocol used for communications
+#  between nodes in a cluster. For things like cluster updates, 
+# master elections, nodes joining/leaving, shard allocation
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: kube-system
+spec:
+  serviceName: "elasticsearch"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      volumes:
+      - name: task-pv-storage
+        persistentVolumeClaim:
+          claimName: task-pv-claim
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
+        env:
+        - name: discovery.type
+          value: single-node
+        ports:
+        - containerPort: 9200
+          name: client
+        - containerPort: 9300
+          name: nodes
+        volumeMounts:
+        - name: task-pv-storage
+          mountPath: /usr/share/elasticsearch/data
+          subPath: "ElasticSearch-Data"

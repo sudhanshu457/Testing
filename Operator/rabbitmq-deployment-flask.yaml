@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: rabbitmq-deployment-flask
+    labels:
+        app: backend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: rabbitmq
+    template:
+        metadata:
+            labels:
+                app: rabbitmq
+        spec:
+            volumes:
+                - name: task-pv-storage
+                  persistentVolumeClaim:
+                     claimName: task-pv-claim
+            containers:
+                - name: rabbitmq
+                  image: gcr.io/cloudpoint-development/rabbitmq:v1
+                  ports:
+                    - name: without-ssl
+                      containerPort: 5672
+                    - name: with-ssl
+                      containerPort: 5671
+                  volumeMounts:
+                    - name: task-pv-storage
+                      mountPath: "/certificate/rabbitmq"
+                      subPath: "Rabbitmq-server-certificate"
+                    - name: task-pv-storage
+                      mountPath: "/certificate/CA"
+                      subPath: "Trusted-CA"
+                - name: flask
+                  image: gcr.io/cloudpoint-development/flask:v1
+                  ports:
+                    - name: http
+                      containerPort: 5000
+                  livenessProbe:
+                      httpGet:
+                        path: /live
+                        port: 5000
+                      initialDelaySeconds: 3
+                      periodSeconds: 3
+                  readinessProbe:
+                      httpGet:
+                        path: /ready
+                        port: 5000
+                      initialDelaySeconds: 3
+                      periodSeconds: 3
+                  
+
+                    
+        

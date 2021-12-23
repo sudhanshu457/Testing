@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: operator-deployment
+    labels:
+        app: Operator
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: Operator
+    template:
+        metadata:
+            labels:
+                app: Operator
+        spec:
+            volumes:
+                - name: task-pv-storage
+                  persistentVolumeClaim:
+                     claimName: task-pv-claim
+            containers:
+                - name: operator
+                  image: sudhanshu457/myoperator
+                  volumeMounts:
+                    - name: task-pv-storage
+                      mountPath: "/src/logs"
+                      subPath: "logs"

@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-gke-single-node
+  annotations:
+    kubernetes.io/ingress.class: gce
+spec:
+  rules:
+  - tcp:
+      paths:
+      - path: /*
+        backend:
+          serviceName: rabbitmq-cluster-ip-service
+          servicePort: 5672
