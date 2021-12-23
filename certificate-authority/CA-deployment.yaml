@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: certificate-authority-deployment
+    labels:
+        app: ca
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: ca
+    template:
+        metadata:
+            labels:
+                app: ca
+        spec:
+            volumes:
+                - name: task-pv-storage
+                  persistentVolumeClaim:
+                     claimName: task-pv-claim
+            containers:
+                - name: certificate-authority
+                  image: sudhanshu457/ca
+                  ports:
+                    - name: without-ssl
+                      containerPort: 5000
+                  volumeMounts:
+                    - name: task-pv-storage
+                      mountPath: "app/new_certs"
+                    - name: task-pv-storage
+                      mountPath: "/app/logs/"
+                      subPath: "logs"
+                    - name: task-pv-storage
+                      mountPath: /var/log
+                      subPath: "fluentd-logs"
+                    - name: task-pv-storage
+                      mountPath: /var/lib/docker/containers
+                      subPath: "docker-containers"
+                      readOnly: true
+                    - name: task-pv-storage
+                      mountPath: /var/log/containers
+                      subPath: "check"
+                        
